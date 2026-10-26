@@ -32,3 +32,13 @@ Tailwind CSS is configured through the Vite plugin and imported into the project
 ## Build
 
 Run `npm run build` to generate the production build in the `dist` directory.
+## Responsive Testing
+
+The dashboard was checked in Chrome DevTools at the following viewport widths:
+
+- 375px — Mobile
+- 768px — Tablet
+- 1024px — Small desktop
+- 1440px — Large desktop
+
+The layout, navigation, booking table, and booking form were checked at these sizes. The dashboard displayed correctly across all four viewport widths.
