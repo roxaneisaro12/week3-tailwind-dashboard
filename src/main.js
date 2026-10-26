@@ -1,4 +1,3 @@
-
 import './style.css'
 
 const defaultBookings = [
@@ -29,6 +28,32 @@ function loadBookings() {
 }
 
 const bookings = loadBookings()
+
+let chartPeriod = 'Last 7 months'
+
+const revenuePeriods = {
+  'Last 7 months': {
+    total: '$48,290',
+    bars: [
+      { month: 'Apr', height: 40 },
+      { month: 'May', height: 56 },
+      { month: 'Jun', height: 46 },
+      { month: 'Jul', height: 69 },
+      { month: 'Aug', height: 61 },
+      { month: 'Sep', height: 87 },
+      { month: 'Oct', height: 75 },
+    ],
+  },
+  'Last 30 days': {
+    total: '$12,640',
+    bars: [
+      { month: 'W1', height: 42 },
+      { month: 'W2', height: 65 },
+      { month: 'W3', height: 53 },
+      { month: 'W4', height: 88 },
+    ],
+  },
+}
 
 function saveBookings() {
   try {
@@ -175,7 +200,6 @@ function renderBookings() {
   document.querySelector('#booking-count').textContent =
     `${filtered.length} ${filtered.length === 1 ? 'booking' : 'bookings'}`
 }
-
 function render() {
   app.innerHTML = `
     <div class="min-h-screen bg-ivory text-charcoal">
@@ -308,36 +332,28 @@ function render() {
                 <div>
                   <p class="eyebrow">Financial performance</p>
                   <h3 class="mt-2 font-display text-2xl">Revenue overview</h3>
-                  <p class="mt-2 text-sm text-stone-500">Monthly revenue across the last seven months.</p>
+                  <p class="mt-2 text-sm text-stone-500">Revenue for ${chartPeriod.toLowerCase()}.</p>
                 </div>
                 <select id="chart-period" aria-label="Revenue chart period" class="rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs">
-                  <option>Last 7 months</option>
-                  <option>Last 30 days</option>
+                  <option ${chartPeriod === 'Last 7 months' ? 'selected' : ''}>Last 7 months</option>
+                  <option ${chartPeriod === 'Last 30 days' ? 'selected' : ''}>Last 30 days</option>
                 </select>
               </div>
 
-              <div class="mt-8 grid grid-cols-7 gap-3 border-b border-stone-200 pb-3 sm:gap-5">
-                ${[
-                  { month: 'Apr', height: 40 },
-                  { month: 'May', height: 56 },
-                  { month: 'Jun', height: 46 },
-                  { month: 'Jul', height: 69 },
-                  { month: 'Aug', height: 61 },
-                  { month: 'Sep', height: 87 },
-                  { month: 'Oct', height: 75 },
-                ].map((item, index) => `
+              <div class="mt-8 grid gap-3 border-b border-stone-200 pb-3 sm:gap-5" style="grid-template-columns: repeat(${revenuePeriods[chartPeriod].bars.length}, minmax(0, 1fr))">
+                ${revenuePeriods[chartPeriod].bars.map((item, index) => `
                   <div class="flex flex-col items-center gap-3">
                     <div class="flex h-40 w-full items-end">
-                      <div class="w-full rounded-t-md ${index === 5 ? 'bg-charcoal' : 'bg-[#DEDAD0] hover:bg-[#C9C1B2]'} transition-colors" style="height:${item.height}%"></div>
+                      <div class="w-full rounded-t-md ${index === revenuePeriods[chartPeriod].bars.length - 1 ? 'bg-charcoal' : 'bg-[#DEDAD0] hover:bg-[#C9C1B2]'} transition-colors" style="height:${item.height}%"></div>
                     </div>
-                    <span class="text-xs ${index === 5 ? 'font-semibold text-charcoal' : 'text-stone-500'}">${item.month}</span>
+                    <span class="text-xs ${index === revenuePeriods[chartPeriod].bars.length - 1 ? 'font-semibold text-charcoal' : 'text-stone-500'}">${item.month}</span>
                   </div>
                 `).join('')}
               </div>
 
               <div class="mt-5 flex items-center justify-between">
                 <span class="text-xs text-stone-500">Total revenue this period</span>
-                <span class="text-sm font-semibold">$48,290</span>
+                <span class="text-sm font-semibold">${revenuePeriods[chartPeriod].total}</span>
               </div>
             </article>
 
@@ -462,7 +478,7 @@ function render() {
               <h2 id="modal-title" class="mt-2 font-display text-3xl">Add a booking</h2>
               <p class="mt-2 text-sm leading-6 text-stone-500">Enter the details below to add a traveller to your bookings.</p>
             </div>
-            <button id="close-modal" aria-label="Close dialog" class="rounded-lg px-3 py-2 text-stone-500 transition hover:bg-stone-100 hover:text-charcoal">✕</button>
+            <button id="close-modal" aria-label="Close dialog" class="rounded-lg px-3 py-2 text-stone-500 transition hover:bg-stone-100 hover:text-charcoal">×</button>
           </div>
 
           <form id="booking-form" class="mt-7 space-y-4">
@@ -511,7 +527,6 @@ function render() {
   renderBookings()
   bindEvents()
 }
-
 function showToast(message) {
   const toast = document.querySelector('#toast')
   toast.textContent = message
@@ -602,7 +617,7 @@ function bindEvents() {
 
     const date = new Date(`${dateValue}T12:00:00`)
 
-      if (Number.isNaN(date.getTime())) {
+    if (Number.isNaN(date.getTime())) {
       showToast('Please enter a valid travel date.')
       return
     }
@@ -616,6 +631,7 @@ function bindEvents() {
       showToast('Travel date cannot be in the past.')
       return
     }
+
     const formattedDate = date.toLocaleDateString('en-US', {
       month: 'short',
       day: '2-digit',
@@ -700,7 +716,8 @@ function bindEvents() {
   })
 
   document.querySelector('#chart-period').addEventListener('change', (event) => {
-    showToast(`Selected period: ${event.target.value}. Demo chart data is unchanged.`)
+    chartPeriod = event.target.value
+    render()
   })
 }
 
