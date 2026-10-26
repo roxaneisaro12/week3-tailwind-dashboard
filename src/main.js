@@ -1,7 +1,7 @@
 
 import './style.css'
 
-const bookings = [
+const defaultBookings = [
   { id: 'RD-1042', guest: 'Amara Uwimana', destination: 'Cape Town', date: 'Oct 28, 2026', amount: 1240, status: 'Confirmed' },
   { id: 'RD-1041', guest: 'Daniel Mutesi', destination: 'Zanzibar', date: 'Oct 29, 2026', amount: 860, status: 'Pending' },
   { id: 'RD-1040', guest: 'Grace Niyonzima', destination: 'Marrakech', date: 'Oct 30, 2026', amount: 1580, status: 'Confirmed' },
@@ -10,27 +10,57 @@ const bookings = [
   { id: 'RD-1037', guest: 'Samuel Karemera', destination: 'Dubai', date: 'Nov 06, 2026', amount: 1780, status: 'Pending' },
 ]
 
+function loadBookings() {
+  try {
+    const savedBookings = localStorage.getItem('roamdesk-bookings')
+
+    if (savedBookings !== null) {
+      const parsedBookings = JSON.parse(savedBookings)
+
+      if (Array.isArray(parsedBookings)) {
+        return parsedBookings
+      }
+    }
+  } catch (error) {
+    console.error('Could not load saved bookings:', error)
+  }
+
+  return [...defaultBookings]
+}
+
+const bookings = loadBookings()
+
+function saveBookings() {
+  try {
+    localStorage.setItem('roamdesk-bookings', JSON.stringify(bookings))
+    return true
+  } catch (error) {
+    console.error('Could not save bookings:', error)
+    return false
+  }
+}
+
 const destinations = [
   {
     name: 'Amalfi Coast',
     country: 'Italy',
     price: 1890,
     image: 'photo-1533105079780-92b9be482077',
-    description: 'Coastal escapes'
+    description: 'Coastal escapes',
   },
   {
     name: 'Marrakech',
     country: 'Morocco',
     price: 1240,
     image: 'photo-1539020140153-e479b8c22e70',
-    description: 'Culture & discovery'
+    description: 'Culture & discovery',
   },
   {
     name: 'Bali',
     country: 'Indonesia',
     price: 2100,
     image: 'photo-1537996194471-e657df975ab4',
-    description: 'Island retreats'
+    description: 'Island retreats',
   },
 ]
 
@@ -39,26 +69,34 @@ const activities = [
     title: 'New booking received',
     detail: 'Amara Uwimana · Cape Town',
     time: '12 min ago',
-    mark: '+'
+    mark: '+',
   },
   {
     title: 'Payment confirmed',
     detail: 'Paris reservation · RD-1038',
     time: '48 min ago',
-    mark: '✓'
+    mark: '✓',
   },
   {
     title: 'Reservation updated',
     detail: 'Zanzibar departure details',
     time: '2 hours ago',
-    mark: '↻'
+    mark: '↻',
   },
 ]
 
 let searchTerm = ''
 let selectedStatus = 'All'
 let sidebarOpen = false
-let nextBookingNumber = 1043
+
+let nextBookingNumber =
+  Math.max(
+    1042,
+    ...bookings.map((booking) => {
+      const match = /^RD-(\d+)$/.exec(booking.id)
+      return match ? Number(match[1]) : 0
+    }),
+  ) + 1
 
 const app = document.querySelector('#app')
 
@@ -101,7 +139,8 @@ function renderBookings() {
 
   filtered.forEach((booking) => {
     const row = document.createElement('tr')
-    row.className = 'border-b border-stone-100 last:border-0 transition hover:bg-stone-50/80'
+    row.className =
+      'border-b border-stone-100 last:border-0 transition hover:bg-stone-50/80'
 
     row.append(
       createCell(booking.id, 'font-semibold text-stone-800'),
@@ -538,7 +577,7 @@ function bindEvents() {
     if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
       closeModal()
     }
-  }, { once: true })
+  })
 
   form.addEventListener('submit', (event) => {
     event.preventDefault()
@@ -583,15 +622,29 @@ function bindEvents() {
       status,
     })
 
+    const saved = saveBookings()
+
     selectedStatus = 'All'
     searchTerm = ''
     closeModal()
     render()
-    showToast('Booking added successfully.')
+
+    showToast(
+      saved
+        ? 'Booking added and saved successfully.'
+        : 'Booking added, but could not be saved in this browser.',
+    )
   })
 
   document.querySelector('#export-button').addEventListener('click', () => {
-    const header = ['Booking ID', 'Guest', 'Destination', 'Travel date', 'Amount', 'Status']
+    const header = [
+      'Booking ID',
+      'Guest',
+      'Destination',
+      'Travel date',
+      'Amount',
+      'Status',
+    ]
 
     const csvRows = [
       header,
@@ -607,7 +660,7 @@ function bindEvents() {
 
     const csv = csvRows
       .map((row) =>
-        row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',')
+        row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(','),
       )
       .join('\r\n')
 
