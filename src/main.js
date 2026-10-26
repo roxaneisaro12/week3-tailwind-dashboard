@@ -602,11 +602,20 @@ function bindEvents() {
 
     const date = new Date(`${dateValue}T12:00:00`)
 
-    if (Number.isNaN(date.getTime())) {
+      if (Number.isNaN(date.getTime())) {
       showToast('Please enter a valid travel date.')
       return
     }
 
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const selectedDate = new Date(`${dateValue}T00:00:00`)
+
+    if (selectedDate < today) {
+      showToast('Travel date cannot be in the past.')
+      return
+    }
     const formattedDate = date.toLocaleDateString('en-US', {
       month: 'short',
       day: '2-digit',
