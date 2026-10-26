@@ -42,3 +42,7 @@ The dashboard was checked in Chrome DevTools at the following viewport widths:
 - 1440px — Large desktop
 
 The layout, navigation, booking table, and booking form were checked at these sizes. The dashboard displayed correctly across all four viewport widths.
+## Future Improvements
+
+- Add more booking filters and sorting options.
+- Connect the dashboard to a real booking API.
