@@ -28,7 +28,24 @@ function loadBookings() {
 }
 
 const bookings = loadBookings()
+function loadTheme() {
+  try {
+    return localStorage.getItem('roamdesk-theme') === 'dark'
+      ? 'dark'
+      : 'light'
+  } catch {
+    return 'light'
+  }
+}
 
+let currentTheme = loadTheme()
+
+function applyTheme() {
+  document.documentElement.classList.toggle(
+    'dark',
+    currentTheme === 'dark',
+  )
+}
 let chartPeriod = 'Last 7 months'
 
 const revenuePeriods = {
@@ -202,7 +219,7 @@ function renderBookings() {
 }
 function render() {
   app.innerHTML = `
-    <div class="min-h-screen bg-ivory text-charcoal">
+    <div class="min-h-screen bg-ivory text-charcoal"><div class="min-h-screen bg-ivory text-charcoal transition-colors duration-300 dark:bg-[#181715] dark:text-[#F7F6F2]">
 
       <aside id="sidebar"
         class="${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-charcoal px-5 py-6 text-white transition-transform duration-300 lg:translate-x-0">
@@ -253,6 +270,16 @@ function render() {
           </div>
 
           <div class="flex items-center gap-3">
+          
+<button
+  id="theme-toggle"
+  type="button"
+  aria-label="Switch theme"
+  class="rounded-full border border-stone-200 bg-white px-3 py-2 text-sm transition hover:bg-stone-50"
+>
+  <span id="theme-icon">Dark</span>
+</button>
+
             <button id="notification-button" aria-label="Notifications" class="relative rounded-full border border-stone-200 bg-white p-2.5 text-lg transition hover:bg-stone-50">
               ♧
               <span class="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-amber-600"></span>
@@ -539,6 +566,20 @@ function showToast(message) {
 }
 
 function bindEvents() {
+  
+  document.querySelector('#theme-toggle').addEventListener('click', () => {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark'
+
+    try {
+      localStorage.setItem('roamdesk-theme', currentTheme)
+    } catch (error) {
+      console.error('Could not save theme preference:', error)
+    }
+
+    applyTheme()
+    render()
+  })
+
   document.querySelector('#menu-button').addEventListener('click', () => {
     sidebarOpen = !sidebarOpen
     render()
@@ -721,4 +762,5 @@ function bindEvents() {
   })
 }
 
+applyTheme()
 render()
