@@ -2,28 +2,104 @@
 @import "tailwindcss";
 
 @theme {
-  --color-charcoal: #171717;
-  --color-ivory: #F8F6F1;
-  --color-taupe: #D8D0C3;
-  --color-muted: #777168;
+  --color-charcoal: #24231F;
+  --color-ivory: #F7F6F2;
+  --color-paper: #FFFFFF;
+  --color-taupe: #DEDAD0;
+  --color-muted: #817D73;
   --color-gold: #A58A5A;
-  --font-display: Georgia, serif;
+  --font-display: "Georgia", "Times New Roman", serif;
+  --font-sans: "Inter", "Segoe UI", sans-serif;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-ivory);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: #E5DDCC;
+    color: var(--color-charcoal);
+  }
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-taupe/60 bg-white p-5 sm:p-6;
+    @apply rounded-2xl border border-stone-200/80 bg-white;
+    box-shadow: 0 2px 12px rgb(36 35 31 / 2%);
   }
 
   .btn-primary {
-    @apply rounded-lg bg-charcoal px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-charcoal px-4 py-3 text-sm font-medium text-white transition duration-200 hover:bg-stone-700 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-charcoal transition hover:bg-stone-50;
   }
 
   .badge {
-    @apply inline-flex rounded-full px-2.5 py-1 text-xs font-semibold;
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
   }
 
   .nav-link {
-    @apply flex items-center gap-3 rounded-lg px-3 py-3 text-sm text-stone-400 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-gold;
+    @apply flex items-center gap-3 rounded-lg px-3 py-3 text-sm text-stone-400 transition duration-200 hover:bg-white/10 hover:text-white;
+  }
+
+  .nav-link.active {
+    @apply bg-white/10 text-white;
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm text-charcoal placeholder:text-stone-400 transition focus:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-200;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500;
+  }
+
+  .stat-value {
+    @apply mt-5 text-3xl font-semibold tracking-tight text-charcoal sm:text-[2rem];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
