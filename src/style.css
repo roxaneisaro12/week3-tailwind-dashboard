@@ -105,6 +105,7 @@
   }
 }
 
+
 /* RoamDesk dark mode readability fixes */
 html.dark body {
   background-color: #181715;
@@ -167,3 +168,4 @@ html.dark .card {
   background-color: #24231F !important;
   border-color: #403D36 !important;
   color: #F7F6F2;
+}
